@@ -1,0 +1,12 @@
+{
+  "files.associations": {
+    "*.js": "javascriptreact"
+  },
+  "editor.snippetSuggestions": "top",
+  "cSpell.words": [
+    "fetchmedia",
+    "passchange",
+    "readyfetch",
+    "togglescreen"
+  ]
+}
