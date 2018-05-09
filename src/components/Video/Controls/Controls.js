@@ -10,7 +10,11 @@ const Controls = props => {
 
   return (
     <div className={styles.Controls}>
-      <PlayBtn paused={props.pauseable} clicked={props.playing}>
+      <PlayBtn
+        btnType={props.pauseable ? "Success" : "Danger"}
+        paused={props.pauseable}
+        clicked={props.playing}
+      >
         {playOrPause}
       </PlayBtn>
       <Slider />

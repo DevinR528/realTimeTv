@@ -9,7 +9,6 @@ import styles from "./PlayBtn.css";
  */
 const playBtn = props => (
   <button
-    onPaused={props.pauseable}
     className={[styles.Button, styles[props.btnType]].join(" ")}
     onClick={props.clicked}
   >

@@ -5,18 +5,13 @@
     color: #aab;
     cursor: pointer;
     font: inherit;
-    padding: 10px;
-    margin: 10px;
+    padding: 5px;
+    margin: 5px;
     font-weight: bold;
 }
 
 .Button:hover {
     box-shadow: 1px 3px 3px #ccc;
-}
-
-.Button:first-of-type {
-    margin-left: 0;
-    padding-left: 10px;
 }
 
 .Button:disabled {

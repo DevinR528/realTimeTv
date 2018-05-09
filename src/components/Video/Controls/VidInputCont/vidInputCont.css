@@ -1,0 +1,8 @@
+.VideoInput {
+    width: 100%;
+    background-color: #ccc;
+    align-items: flex-start;
+    justify-content: center;
+    display: flex;
+    flex-flow: row;
+}

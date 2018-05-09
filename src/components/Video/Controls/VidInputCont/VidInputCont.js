@@ -12,12 +12,12 @@ const VidInputControls = props => {
         elementType={props.input.eleConfig.type}
         elementConfig={props.input.eleConfig}
         value={props.input.value}
-        changed={props.passChange}
+        changed={props.passchange}
       />
-      <Button disabled={props.readyFetch} clicked={props.fetchMedia}>
+      <Button disabled={!props.readyfetch} clicked={props.fetchmedia}>
         Get
       </Button>
-      <Button clicked={props.toggleScreen}>Toggle</Button>
+      <Button clicked={props.togglescreen}>Toggle</Button>
     </div>
   );
 };

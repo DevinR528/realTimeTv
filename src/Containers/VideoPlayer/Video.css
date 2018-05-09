@@ -1,0 +1,13 @@
+.Screen {
+    width: auto;
+    height: auto;
+    box-sizing: border-box;
+}
+
+.Player {
+    box-sizing: border-box;
+    height: auto;
+    width: auto;
+    display: flex;
+    flex-flow: column;
+}
