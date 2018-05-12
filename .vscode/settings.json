@@ -7,8 +7,13 @@
     "fetchmedia",
     "imgpost",
     "incontrols",
+    "is",
     "passchange",
     "readyfetch",
-    "togglescreen"
+    "togglescreen",
+    "tset",
+    "turl",
+    "y",
+    "youtube"
   ]
 }

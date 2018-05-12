@@ -1,7 +1,7 @@
 import React from "react";
 
 import InputUrl from "./InputUrl/InputUrl";
-import Button from "../../../atoms/UI/Button/Button";
+import Button from "../../../../atoms/UI/Button/Button";
 import styles from "./vidInputCont.css";
 
 const VidInputControls = props => {

@@ -4,7 +4,7 @@ import { updateObject } from "../utility";
 const initialState = {
   videoId: null,
   source: null,
-  play: false,
+  error: false,
   place: 0,
   isScreen: true,
   open: false
@@ -25,8 +25,8 @@ const getMedia = (state, action) => {
   });
 };
 
-const syncPlay = (state, action) => {
-  return updateObject(state, { play: action.play });
+const onError = (state, action) => {
+  return updateObject(state, { error: action.error });
 };
 
 const reducer = (state = initialState, action) => {
@@ -37,8 +37,8 @@ const reducer = (state = initialState, action) => {
       return getScreenType(state, action);
     case actionTypes.GET_MEDIA:
       return getMedia(state, action);
-    case actionTypes.AUTO_PLAY:
-      return syncPlay(state, action);
+    case actionTypes.ON_ERROR:
+      return onError(state, action);
     default:
       return state;
   }

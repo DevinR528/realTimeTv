@@ -8,11 +8,13 @@ import "./index.css";
 import App from "./App";
 import registerServiceWorker from "./registerServiceWorker";
 import videoPlayerReducer from "./store/reducers/videoPlayer";
+import iframeReducer from "./store/reducers/iframe";
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const rootReducer = combineReducers({
-  vid: videoPlayerReducer
+  vid: videoPlayerReducer,
+  iframe: iframeReducer
 });
 
 const store = createStore(

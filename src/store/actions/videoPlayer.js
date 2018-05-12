@@ -21,9 +21,9 @@ export const getMedia = (source, videoId) => {
   };
 };
 
-export const syncMedia = play => {
+export const onError = err => {
   return {
-    type: actionTypes.AUTO_PLAY,
-    play: play
+    type: actionTypes.ON_ERROR,
+    error: err
   };
 };

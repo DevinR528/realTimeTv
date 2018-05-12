@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import queryString from "query-string";
 
-import Screen from "../../components/Video/Screen/VideoScreen/Screen";
+import Screen from "./Screen/VideoScreen/VideoScreen";
 import styles from "./Video.css";
-import VidInputControls from "../../components/Video/Controls/VidInputCont/VidInputCont";
-import Iframe from "../../components/Video/Screen/Iframe/Iframe";
-import * as actions from "../../store/actions/index";
+import VidInputControls from "./Controls/VidInputCont/VidInputCont";
+import Iframe from "./Screen/Iframe/Iframe";
+import * as actions from "../../../store/actions/index";
+import { validateVidUrl } from "./helperUtil";
 
 class Video extends Component {
   state = {
@@ -22,26 +22,22 @@ class Video extends Component {
     fetchable: false
   };
 
-  togglePlayerHandler = () => {
-    this.props.onToggle();
-  };
-
   fetchMediaHandler = event => {
     event.preventDefault();
-    //TODO parse input value to se if iFrame or player will work
-    // if .mp4 then player if .youtube.com
-    const inputUrl = this.state.input.value;
-    const urlObj = queryString.parseUrl(inputUrl);
-    if (urlObj.url.includes(".youtube.com")) {
-      const cutStr = urlObj.url.substr(0, 23);
-      const embedStr = cutStr + "/embed/" + urlObj.query.v;
-      console.log(urlObj);
-      console.log(embedStr);
-      this.props.getScreenType(false);
-      this.props.getMedia(embedStr, urlObj.query.v);
-      if (!this.props.toggle) {
-        this.props.onToggle();
+    this.props.onError(null);
+    try {
+      const urlState = validateVidUrl(this.state.input.value);
+      if (urlState) {
+        this.props.getScreenType(urlState.screenState);
+        this.props.getMedia(urlState.url, urlState.id);
+        if (!this.props.toggle) {
+          this.props.onToggle();
+        }
       }
+    } catch (err) {
+      this.props.onError(err.message);
+
+      console.log(err.message);
     }
   };
 
@@ -61,27 +57,33 @@ class Video extends Component {
   };
 
   render() {
-    let screen = this.props.screenType ? (
+    let vidScreen = this.props.screenType ? (
       <Screen
         imgpost={this.props.poster}
-        incontrols={!this.props.play}
+        incontrols={true}
         source={this.props.source}
       />
     ) : (
-      <Iframe source={this.props.source} utitle={this.state.input.value} />
+      <Iframe />
     );
 
     let mediaPlayer = this.props.toggle ? (
-      <div className={styles.Screen}>{screen}</div>
+      <div className={styles.Screen}>{vidScreen}</div>
     ) : null;
+
+    let onErrorMsg = this.props.errorMsg ? (
+      <p className={styles.Screen}>{this.props.errorMsg}</p>
+    ) : (
+      mediaPlayer
+    );
 
     return (
       <div className={styles.Player}>
-        {mediaPlayer}
+        {onErrorMsg}
         <VidInputControls
           input={this.state.input}
           passchange={event => this.inputChangedHandler(event)}
-          togglescreen={this.togglePlayerHandler}
+          togglescreen={this.props.onToggle}
           readyfetch={this.state.fetchable}
           fetchmedia={this.fetchMediaHandler}
         />
@@ -94,7 +96,7 @@ const mapStateToProps = state => {
   return {
     source: state.vid.source,
     toggle: state.vid.open,
-    fetchable: state.vid.fetchable,
+    errorMsg: state.vid.error,
     screenType: state.vid.isScreen,
     play: state.vid.play
   };
@@ -105,7 +107,7 @@ const mapDispatchToProps = dispatch => {
     onToggle: () => dispatch(actions.toggleScreen()),
     getScreenType: screen => dispatch(actions.getScreenType(screen)),
     getMedia: (source, id) => dispatch(actions.getMedia(source, id)),
-    syncPlay: () => dispatch(actions.syncMedia())
+    onError: err => dispatch(actions.onError(err))
   };
 };
 

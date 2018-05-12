@@ -23,7 +23,7 @@
 
 .InputElement:focus {
     outline: none;
-    background-color: #ccc;
+    background-color: whitesmoke;
     box-shadow: 0 2px 3px rgb(140, 139, 139);
 }
 

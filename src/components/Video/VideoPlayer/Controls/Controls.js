@@ -1,8 +1,6 @@
 import React from "react";
 
 import PlayBtn from "./Play/PlayBtn";
-import Slider from "./Slider/Slider";
-import Skip from "./Skip/Skip";
 import styles from "./Controls.css";
 
 const Controls = props => {
@@ -17,8 +15,6 @@ const Controls = props => {
       >
         {playOrPause}
       </PlayBtn>
-      <Slider />
-      <Skip />
     </div>
   );
 };
