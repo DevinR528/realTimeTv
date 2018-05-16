@@ -1,6 +1,6 @@
 import * as actionTypes from "./actionTypes";
 
-export const toggleScreen = () => {
+export const toggleScreen = optForceOpen => {
   return {
     type: actionTypes.TOGGLE_SCREEN
   };

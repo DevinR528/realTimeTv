@@ -5,6 +5,7 @@ const initialState = {
   videoId: null,
   source: null,
   error: false,
+  place: 0,
   isScreen: true,
   open: false
 };

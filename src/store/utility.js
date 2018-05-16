@@ -31,3 +31,12 @@ export const loadSdk = () => {
     });
   });
 };
+
+export const eventNames = {
+  ready: "onReady",
+  stateChange: "onStateChange",
+  playbackQualityChange: "onPlaybackQualityChange",
+  playbackRateChange: "onPlaybackRateChange",
+  error: "onError",
+  apiChange: "onApiChange"
+};

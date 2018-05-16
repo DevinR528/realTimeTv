@@ -1,27 +1,24 @@
 import * as actionTypes from "./actionTypes";
-import { loadSdk } from "../utility";
+import { loadSdk, eventNames } from "../utility";
 
 export const createYT = videoId => {
   return dispatch => {
     loadSdk()
       .then(YT => {
         return new Promise(res => {
-          // eslint-disable-next-line no-unused-vars
+          this.resPlayer = res;
           const player = new YT.Player("player", {
             height: "200",
             width: "369",
             videoId: `${videoId}`,
             events: {
               onReady: onPlayerReady,
-              onStateChange: onPlayerStateChange,
-              playbackQualityChange: onPlaybackQualityChange,
-              playbackRateChange: onPlaybackRateChange,
-              onError: onPlayerError
+              onStateChange: onPlayerStateChange
             }
           });
           function onPlayerReady(event) {
             dispatch(onReady(true));
-            //event.target.playVideo();
+            event.target.playVideo();
           }
           function onPlayerStateChange(event) {
             console.log(event);
@@ -66,35 +63,6 @@ export const onStateChange = stateNum => {
   };
 };
 
-export const onQualityChange = quality => {
-  return {
-    type: actionTypes.ON_QUALITY_CHANGE,
-    quality: quality
-  };
-};
-
-export const onRateChange = rate => {
-  return {
-    type: actionTypes.ON_RATE_CHANGE,
-    rate: rate
-  };
-};
-
-export const onYTError = errCode => {
-  return {
-    type: actionTypes.ON_YT_ERROR,
-    errCode: errCode
-  };
-};
-
-export const playYT = () => {
-  return dispatch => {
-    dispatch(_internalPlay());
-  };
-};
-
-export const _internalPlay = player => {
-  return dispatch => {
-    player.playVideo();
-  };
+export const getControlPlayer = vidSrc => {
+  return {};
 };
