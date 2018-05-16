@@ -7,6 +7,7 @@ import styles from "./Video.css";
 import VidInputControls from "./Controls/VidInputCont/VidInputCont";
 import Iframe from "./Screen/Iframe/Iframe";
 import {} from "./socketIOUtils";
+import ActClass from "../../../store/actions/iframeClass";
 import * as actions from "../../../store/actions/index";
 import { validateVidUrl } from "./helperUtil";
 
@@ -187,7 +188,7 @@ const mapDispatchToProps = dispatch => {
     getScreenType: screen => dispatch(actions.getScreenType(screen)),
     getMedia: (source, id) => dispatch(actions.getMedia(source, id)),
     onError: err => dispatch(actions.onError(err)),
-    playYT: player => dispatch(actions.playYT(window.YT.Player))
+    playYT: player => dispatch(ActClass.playYT())
   };
 };
 

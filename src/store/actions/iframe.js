@@ -40,7 +40,10 @@ export const createYT = videoId => {
             dispatch(onYTError(event.data));
             console.log(event);
           }
+          res = player;
+          return res;
         });
+        return YT;
       })
       // TODO
       .catch(err => {

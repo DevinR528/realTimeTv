@@ -1,12 +1,12 @@
 import * as actionTypes from "./actionTypes";
 import { loadSdk } from "../utility";
 
-class Iframe {
+class ActClass {
   constructor() {
     this.YTPlayer = null;
   }
 
-  createYT = videoId => {
+  createYT(videoId) {
     return dispatch => {
       loadSdk()
         .then(YT => {
@@ -53,14 +53,14 @@ class Iframe {
               });
             }
           );
-          console.log(this.YT);
         })
         // TODO
         .catch(err => {
           console.log(err);
         });
+      console.log(this.YTPlayer);
     };
-  };
+  }
 
   onReady(isReady) {
     return {
@@ -110,4 +110,4 @@ class Iframe {
   };
 }
 
-export default Iframe;
+export default ActClass;
