@@ -6,8 +6,11 @@ import styles from "./Video.css";
 import VidInputControls from "./Controls/VidInputCont/VidInputCont";
 import Iframe from "./Screen/Iframe/Iframe";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import {} from "./socketIOUtils";
 import ActClass from "../../../store/actions/iframeClass";
+=======
+>>>>>>> parent of c6ed91b... before class Iframe implemented
 =======
 >>>>>>> parent of c6ed91b... before class Iframe implemented
 import * as actions from "../../../store/actions/index";
@@ -113,8 +116,12 @@ const mapDispatchToProps = dispatch => {
     getScreenType: screen => dispatch(actions.getScreenType(screen)),
     getMedia: (source, id) => dispatch(actions.getMedia(source, id)),
 <<<<<<< HEAD
+<<<<<<< HEAD
     onError: err => dispatch(actions.onError(err)),
     playYT: player => dispatch(ActClass.playYT())
+=======
+    onError: err => dispatch(actions.onError(err))
+>>>>>>> parent of c6ed91b... before class Iframe implemented
 =======
     onError: err => dispatch(actions.onError(err))
 >>>>>>> parent of c6ed91b... before class Iframe implemented

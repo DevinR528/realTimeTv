@@ -24,6 +24,7 @@ export const createYT = videoId => {
             console.log(event);
             dispatch(onStateChange(event.data));
           }
+<<<<<<< HEAD
           function onPlaybackQualityChange(event) {
             dispatch(onQualityChange(event.data));
             event.target.setPlaybackQuality(event.data);
@@ -39,6 +40,13 @@ export const createYT = videoId => {
           }
           res = player;
           return res;
+=======
+
+          Object.keys(eventNames).forEach(ytName => {
+            const ytFiredEvents = eventNames[ytName];
+            console.log(ytFiredEvents);
+          });
+>>>>>>> parent of c6ed91b... before class Iframe implemented
         });
         return YT;
       })

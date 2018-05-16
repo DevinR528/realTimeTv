@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 
 import * as actions from "../../../../../store/actions/index";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import ErrorBoundary from "../../../../atoms/hoc/withErrorHandler/withErrorHandler";
 import ActClass from "../../../../../store/actions/iframeClass";
 import styles from "./Iframe.css";
@@ -14,6 +15,12 @@ class Iframe extends Component {
   }
   componentWillMount() {}
 
+=======
+import styles from "./Iframe.css";
+
+class Iframe extends Component {
+  //TODO test to make sure async await didnt do anything
+>>>>>>> parent of c6ed91b... before class Iframe implemented
 =======
 import styles from "./Iframe.css";
 

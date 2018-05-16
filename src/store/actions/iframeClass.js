@@ -2,9 +2,15 @@ import * as actionTypes from "./actionTypes";
 import { loadSdk, eventNames } from "../utility";
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 class ActClass {
   constructor() {
     this.YTPlayer = null;
+=======
+class IframeAction {
+  constructor(props) {
+    this.props = props;
+>>>>>>> parent of c6ed91b... before class Iframe implemented
 =======
 class IframeAction {
   constructor(props) {
@@ -30,6 +36,7 @@ class IframeAction {
             function onPlayerReady(event) {
               dispatch(this.onReady(true));
               event.target.playVideo();
+<<<<<<< HEAD
             }
             function onPlayerStateChange(event) {
               console.log(event);
@@ -38,6 +45,13 @@ class IframeAction {
 <<<<<<< HEAD
           );
 =======
+=======
+            }
+            function onPlayerStateChange(event) {
+              console.log(event);
+              dispatch(this.onStateChange(event.data));
+            }
+>>>>>>> parent of c6ed91b... before class Iframe implemented
 
             Object.keys(eventNames).forEach(ytName => {
               const ytFiredEvents = eventNames[ytName];
@@ -49,6 +63,9 @@ class IframeAction {
               });
             });
           });
+<<<<<<< HEAD
+>>>>>>> parent of c6ed91b... before class Iframe implemented
+=======
 >>>>>>> parent of c6ed91b... before class Iframe implemented
         })
         // TODO
@@ -79,7 +96,11 @@ class IframeAction {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 export default ActClass;
+=======
+export default IframeAction;
+>>>>>>> parent of c6ed91b... before class Iframe implemented
 =======
 export default IframeAction;
 >>>>>>> parent of c6ed91b... before class Iframe implemented
