@@ -1,45 +1,59 @@
 import * as actionTypes from "./actionTypes";
-import { loadSdk, eventNames } from "../utility";
+import { loadSdk } from "../utility";
 
-class IframeAction {
-  constructor(props) {
-    this.props = props;
+class Iframe {
+  constructor() {
+    this.YTPlayer = null;
   }
 
   createYT = videoId => {
     return dispatch => {
       loadSdk()
         .then(YT => {
-          return new Promise(res => {
-            this.resPlayer = res;
-            const player = new YT.Player("player", {
-              height: "200",
-              width: "369",
-              videoId: `${videoId}`,
-              events: {
-                onReady: onPlayerReady,
-                onStateChange: onPlayerStateChange
-              }
-            });
-            function onPlayerReady(event) {
-              dispatch(this.onReady(true));
-              event.target.playVideo();
-            }
-            function onPlayerStateChange(event) {
-              console.log(event);
-              dispatch(this.onStateChange(event.data));
-            }
-
-            Object.keys(eventNames).forEach(ytName => {
-              const ytFiredEvents = eventNames[ytName];
-              console.log(ytFiredEvents);
-              player.addEventListener(ytName, e => {
-                if (this[ytFiredEvents]) {
-                  this[ytFiredEvents](e);
+          return new Promise(
+            res => {
+              // eslint-disable-next-line no-unused-vars
+              this.YTPlayer = new YT.Player("player", {
+                height: "200",
+                width: "369",
+                videoId: `${videoId}`,
+                events: {
+                  onReady: onPlayerReady,
+                  onStateChange: onPlayerStateChange,
+                  playbackQualityChange: onPlaybackQualityChange,
+                  playbackRateChange: onPlaybackRateChange,
+                  onError: onPlayerError
                 }
               });
-            });
-          });
+              function onPlayerReady(event) {
+                dispatch(this.onReady(true));
+                //event.target.playVideo();
+              }
+              function onPlayerStateChange(event) {
+                console.log(event);
+                dispatch(this.onStateChange(event.data));
+              }
+              function onPlaybackQualityChange(event) {
+                dispatch(this.onQualityChange(event.data));
+                event.target.setPlaybackQuality(event.data);
+              }
+              function onPlaybackRateChange(event) {
+                dispatch(this.onRateChange(event.data));
+                event.target.setPlaybackRate(event.data);
+              }
+              //2 bad videoID, 5html, 100 not found, 101 and 150 owner denial,
+              function onPlayerError(event) {
+                dispatch(this.onYTError(event.data));
+                console.log(event);
+              }
+            },
+            rej => {
+              rej(reason => {
+                console.log(reason);
+              });
+            }
+          );
+          console.log(this.YT);
         })
         // TODO
         .catch(err => {
@@ -48,12 +62,12 @@ class IframeAction {
     };
   };
 
-  onReady = isReady => {
+  onReady(isReady) {
     return {
       type: actionTypes.ON_READY,
       isReady: isReady
     };
-  };
+  }
 
   onStateChange = stateNum => {
     return {
@@ -62,9 +76,38 @@ class IframeAction {
     };
   };
 
-  getControlPlayer = vidSrc => {
-    return {};
+  onQualityChange = quality => {
+    return {
+      type: actionTypes.ON_QUALITY_CHANGE,
+      quality: quality
+    };
+  };
+
+  onRateChange = rate => {
+    return {
+      type: actionTypes.ON_RATE_CHANGE,
+      rate: rate
+    };
+  };
+
+  onYTError = errCode => {
+    return {
+      type: actionTypes.ON_YT_ERROR,
+      errCode: errCode
+    };
+  };
+
+  playYT = () => {
+    return dispatch => {
+      dispatch(this._internalPlay(this.YTPlayer));
+    };
+  };
+
+  _internalPlay = player => {
+    return dispatch => {
+      player.playVideo();
+    };
   };
 }
 
-export default IframeAction;
+export default Iframe;
