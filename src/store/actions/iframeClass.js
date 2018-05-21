@@ -53,7 +53,6 @@ class Iframe {
               });
             }
           );
-          console.log(this.YT);
         })
         // TODO
         .catch(err => {

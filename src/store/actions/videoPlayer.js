@@ -27,3 +27,52 @@ export const onError = err => {
     error: err
   };
 };
+
+export const setSocketPlay = shouldPlay => {
+  return {
+    type: actionTypes.SET_SOCKET_PLAY,
+    socketPlay: shouldPlay
+  };
+};
+
+export const setSocketMaster = socketMasterId => {
+  return {
+    type: actionTypes.SET_SOCKET_MASTER,
+    socketMaster: socketMasterId
+  };
+};
+
+export const setMySocketId = mySocketId => {
+  return {
+    type: actionTypes.SET_MY_SOCKET_ID,
+    mySocketId: mySocketId
+  };
+};
+
+export const setSocketPlace = socketPlace => {
+  return {
+    type: actionTypes.SET_SOCKET_PLACE,
+    socketPlace: socketPlace
+  };
+};
+
+export const setSocketRate = socketRate => {
+  return {
+    type: actionTypes.SET_SOCKET_RATE,
+    socketRate: socketRate
+  };
+};
+
+export const setSocketYTError = socketYTError => {
+  return {
+    type: actionTypes.SET_SOCKET_YT_ERROR,
+    socketYTError: socketYTError
+  };
+};
+
+export const setSocketState = socketState => {
+  return {
+    type: actionTypes.SET_SOCKET_STATE,
+    socketState: socketState
+  };
+};

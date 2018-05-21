@@ -1,7 +1,7 @@
 .App {
     height: auto;
     width: 375px;
-    margin: 50%;
+    margin: auto 50% 50% 50%;
     display: flex;
     flex-flow: column;
     border-radius: 8px;

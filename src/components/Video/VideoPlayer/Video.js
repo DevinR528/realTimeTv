@@ -6,16 +6,10 @@ import Screen from "./Screen/VideoScreen/VideoScreen";
 import styles from "./Video.css";
 import VidInputControls from "./Controls/VidInputCont/VidInputCont";
 import Iframe from "./Screen/Iframe/Iframe";
-import {} from "./socketIOUtils";
 import * as actions from "../../../store/actions/index";
 import { validateVidUrl } from "./helperUtil";
 
 class Video extends Component {
-  constructor(props) {
-    super(props);
-    this.socket = null;
-  }
-
   state = {
     input: {
       eleType: "input",
@@ -31,69 +25,94 @@ class Video extends Component {
 
   componentWillMount() {
     console.log("[compWillMount]");
-    this.socket = io.connect("http://localhost:3000", {
+    this.socket = io.connect("http://localhost:5000", {
       transports: ["websocket"]
     });
+
+    this.socket.on("connect", () => {
+      this.props.setMySocketId(this.socket.id);
+    });
+
     this.socket.on("reconnect_attempt", () => {
       console.log("[in reconnect]");
-      console.dir(this.socket.io);
       this.socket.io.opts.transports = ["polling", "websocket"];
     });
 
-    this.socket.on("upDateVideo", recObj => {
-      console.log("[in upDateVideo]");
-      this.getScreenType(recObj.screenState);
-      this.getMedia(recObj.url, recObj.id);
-      if (!this.toggle) {
-        this.onToggle();
+    // sync's all video players to current video url
+    this.socket.on("updateVideo", recObj => {
+      console.log("[in updateVideo]");
+      this.props.setSocketMaster(recObj.controlId);
+      this.props.getScreenType(recObj.screenState);
+      this.props.getMedia(recObj.url, recObj.id);
+      if (!this.props.toggle) {
+        this.props.onToggle();
       }
     });
 
-    this.socket.on("allIsReady", recObj => {
+    // starts all players at the same time once ready
+    this.socket.on("allIsReady", () => {
       console.log("[in allIsReady]");
+      this.props.setSocketPlay(true);
+    });
+
+    // sync's playback rate so video stays synced
+    this.socket.on("updateRate", recObj => {
+      console.log("[in updateRate]");
+      this.props.setSocketRate(recObj.rate);
+    });
+
+    // if error occurs deals with error
+    this.socket.on("updateError", recObj => {
+      console.log("[in updateError]");
+      this.props.setSocketYTErr(recObj.err);
+    });
+
+    // sync's state of video play, pause and checks for duration changes
+    this.socket.on("updateState", recObj => {
+      console.log("[in updateState]");
+      this.props.setSocketState(recObj.state);
+    });
+
+    // sync's video duration
+    this.socket.on("updatePlace", recObj => {
+      console.log("[in updatePlace]");
+      this.props.setSocketPlace(recObj.place);
     });
 
     console.dir(this.socket);
   }
 
+  componentDidMount() {}
+
   componentWillReceiveProps(nextProps, nextState) {
     if (nextProps.isReady !== this.props.isReady) {
-      console.log("[cWU]" + nextProps.isReady);
-      this.socket.emit("isReady", { id: this.socket.id });
-    } else if (nextProps.videoId !== this.props.videoId) {
-      console.log("[cWU]" + nextProps.videoId);
-    } else if (nextProps.quality !== this.props.quality) {
-      // set socket for quality
-      console.log("[cWU]" + nextProps.quality);
-    } else if (nextProps.rate !== this.props.rate) {
-      // set socket for rate
-      console.log("[cWU]" + nextProps.rate);
-    } else if (nextProps.stateNum !== this.props.stateNum) {
-      // -1 unstarted, 0 ended, 1 playing, 2 paused, 3 buf, 5 video cued
-      console.log("[cWU]" + nextProps.stateNum);
-      switch (nextProps.stateNum) {
-        case -1:
-          return;
-        case 0:
-          return;
-        case 1:
-          return;
-        case 2:
-          return;
-        case 3:
-          return;
-        case 5:
-          return;
-        default:
-          break;
+      console.log("[cwuReady]" + nextProps.isReady);
+      this.socket.emit("isReady");
+    } else if (nextProps.ytErrCode !== this.props.ytErrCode) {
+      //2 bad videoID, 5html, 100 not found, 101 and 150 owner denial
+      console.log("[cwuytErr]" + nextProps.ytErrCode);
+      this.socket.emit("onYTError", {
+        err: nextProps.ytErrCode
+      });
+    }
+    if (nextProps.socketControlId === nextProps.mySocketId) {
+      if (nextProps.stateNum !== this.props.stateNum) {
+        console.log("[cwuState]" + nextProps.stateNum);
+        this.socket.emit("stateChange", {
+          state: nextProps.stateNum
+        });
+      } else if (nextProps.ytPlace !== this.props.ytPlace) {
+        //2 bad videoID, 5html, 100 not found, 101 and 150 owner denial
+        console.log("[cwuPlace]" + nextProps.ytPlace);
+        this.socket.emit("placeChange", {
+          ytPlace: nextProps.ytPlace
+        });
       }
-    } else {
-      return;
     }
   }
 
   componentWillUnmount() {
-    this.socket.close();
+    this.socket.emit("disconnect", { id: this.socket.id });
   }
 
   fetchMediaHandler = event => {
@@ -103,18 +122,20 @@ class Video extends Component {
     try {
       const urlState = validateVidUrl(this.state.input.value);
       if (urlState) {
+        this.props.setSocketMaster(this.socket.id);
         this.props.getScreenType(urlState.screenState);
         this.props.getMedia(urlState.url, urlState.id);
         if (!this.props.toggle) {
           this.props.onToggle();
         }
+        // to pass videoId, videoURL, screenState
+        this.socket.emit("newVideo", {
+          url: urlState.url,
+          vidId: urlState.id,
+          screenState: urlState.screenState,
+          controlId: this.socket.id
+        });
       }
-      // to pass videoId, videoURL, screenState
-      this.socket.emit("newVideo", {
-        url: urlState.url,
-        id: urlState.id,
-        screenState: urlState.screenState
-      });
     } catch (err) {
       this.props.onError(err.message);
 
@@ -175,9 +196,11 @@ const mapStateToProps = state => {
     screenType: state.vid.isScreen,
     isReady: state.iframe.isReady,
     stateNum: state.iframe.stateNum,
-    quality: state.iframe.quality,
     rate: state.iframe.rate,
-    errCode: state.iframe.errCode
+    ytErrCode: state.iframe.ytErrCode,
+    ytPlace: state.iframe.ytPlace,
+    socketControlId: state.vid.socketMaster,
+    mySocketId: state.vid.mySocketId
   };
 };
 
@@ -187,7 +210,15 @@ const mapDispatchToProps = dispatch => {
     getScreenType: screen => dispatch(actions.getScreenType(screen)),
     getMedia: (source, id) => dispatch(actions.getMedia(source, id)),
     onError: err => dispatch(actions.onError(err)),
-    playYT: player => dispatch(actions.playYT(window.YT.Player))
+    setSocketPlay: shouldPlay => dispatch(actions.setSocketPlay(shouldPlay)),
+    setSocketMaster: controlId => dispatch(actions.setSocketMaster(controlId)),
+    setMySocketId: myId => dispatch(actions.setMySocketId(myId)),
+    setSocketPlace: socketPlace =>
+      dispatch(actions.setSocketPlace(socketPlace)),
+    setSocketRate: socketRate => dispatch(actions.setSocketRate(socketRate)),
+    setSocketState: socketState =>
+      dispatch(actions.setSocketState(socketState)),
+    setSocketYTErr: socketErr => dispatch(actions.setSocketYTError(socketErr))
   };
 };
 
