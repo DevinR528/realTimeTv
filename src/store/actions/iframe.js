@@ -1,7 +1,7 @@
 import * as actionTypes from "./actionTypes";
 import { loadSdk } from "../utility";
 
-export const createYT = (videoId, controls) => {
+export const createYT = videoId => {
   return dispatch => {
     return new Promise(resolve => {
       loadSdk().then(YT => {
@@ -9,7 +9,7 @@ export const createYT = (videoId, controls) => {
           height: "200",
           width: "369",
           videoId: `${videoId}`,
-          playerVars: { controls: controls },
+          playerVars: { origin: window.location.origin },
           events: {
             onReady: onPlayerReady,
             onStateChange: onPlayerStateChange,
@@ -21,28 +21,43 @@ export const createYT = (videoId, controls) => {
         resolve(playerObj);
         function onPlayerReady(event) {
           dispatch(onReady(true));
-          //event.target.playVideo();
         }
+        // -1 un-started, 0 end, 1 play, 2 pause, 3 buff, 5 cued
         function onPlayerStateChange(event) {
-          dispatch(onStateChange(event.data));
-          if (event.data === 2) {
-            const place = event.target.getCurrentTime();
-            dispatch(onPlaceChange(place));
-          } else if (event.data === 0) {
-            dispatch(onEndReset());
+          switch (event.data) {
+            case 1:
+              dispatch(onStateChange(event.data));
+              const playPlace = event.target.getCurrentTime();
+              dispatch(onPlaceChange(playPlace));
+              break;
+            case 2:
+              dispatch(onStateChange(event.data));
+              const pausePlace = event.target.getCurrentTime();
+              dispatch(onPlaceChange(pausePlace));
+              break;
+            case 3:
+              dispatch(onStateChange(event.data));
+              const buffPlace = event.target.getCurrentTime();
+              dispatch(onPlaceChange(buffPlace));
+              break;
+            case 0:
+              break;
+            case -1:
+              break;
+            default:
+              break;
           }
         }
         function onPlaybackQualityChange(event) {
           event.target.setPlaybackQuality(event.data);
         }
         function onPlaybackRateChange(event) {
-          dispatch(onRateChange(event.data));
           event.target.setPlaybackRate(event.data);
         }
         //2 bad videoID, 5html, 100 not found, 101 and 150 owner denial,
         function onPlayerError(event) {
           dispatch(onYTError(event.data));
-          console.log(event);
+          console.log(`[createYTaction] ${event}`);
         }
       });
     });
@@ -60,13 +75,6 @@ export const onStateChange = stateNum => {
   return {
     type: actionTypes.ON_STATE_CHANGE,
     stateNum: stateNum
-  };
-};
-
-export const onRateChange = rate => {
-  return {
-    type: actionTypes.ON_RATE_CHANGE,
-    rate: rate
   };
 };
 

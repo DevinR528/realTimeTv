@@ -56,13 +56,6 @@ export const setSocketPlace = socketPlace => {
   };
 };
 
-export const setSocketRate = socketRate => {
-  return {
-    type: actionTypes.SET_SOCKET_RATE,
-    socketRate: socketRate
-  };
-};
-
 export const setSocketYTError = socketYTError => {
   return {
     type: actionTypes.SET_SOCKET_YT_ERROR,

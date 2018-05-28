@@ -4,7 +4,6 @@ import { updateObject } from "../utility";
 const initialState = {
   isReady: false,
   stateNum: null,
-  rate: null,
   ytErrCode: null,
   ytPlace: null,
   videoDone: false
@@ -19,12 +18,6 @@ const onReady = (state, action) => {
 const onStateChange = (state, action) => {
   return updateObject(state, {
     stateNum: action.stateNum
-  });
-};
-
-const onRateChange = (state, action) => {
-  return updateObject(state, {
-    rate: action.rate
   });
 };
 
@@ -57,8 +50,6 @@ const reducer = (state = initialState, action) => {
       return onReady(state, action);
     case actionTypes.ON_STATE_CHANGE:
       return onStateChange(state, action);
-    case actionTypes.ON_RATE_CHANGE:
-      return onRateChange(state, action);
     case actionTypes.ON_YT_ERROR:
       return onYTError(state, action);
     case actionTypes.ON_YT_PLACE:

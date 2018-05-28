@@ -9,43 +9,35 @@ class Iframe extends Component {
   componentWillMount() {}
 
   componentDidMount() {
-    const controlPlayer =
-      this.props.mySocketId === this.props.socketControlId ? 1 : 0;
-    this.props.createYT(this.props.videoId, controlPlayer).then(player => {
+    this.props.createYT(this.props.videoId).then(player => {
       this.player = player;
       console.dir(this.player);
     });
   }
 
   componentWillReceiveProps(nextProps, nextState) {
-    // sync's duration
-    if (nextProps.socketPlace !== this.props.socketPlace) {
-      console.log("[cWU]" + nextProps.socketPlace);
-      this.player.seekTo(nextProps.socketPlace);
-      // sync's rate
-    } else if (nextProps.socketYTError !== this.props.socketYTError) {
-      console.log("[cWU]" + nextProps.socketYTError);
-      // -1 unstarted, 0 ended, 1 playing, 2 paused, 3 buf, 5 video cued
-    } else if (nextProps.socketState !== this.props.socketState) {
+    // sync's duration on play, and pauses when synced
+    if (nextProps.socketState !== this.props.socketState) {
       console.log("[cWU]" + nextProps.socketState);
+      let playTime, timeDiff;
       switch (nextProps.socketState) {
-        case -1:
-          if (nextProps.socketPlay === true) {
-            this.player.playVideo();
-          }
-          return;
-        case 0:
-          return;
         case 1:
-          this.player.playVideo();
-          return;
+          playTime = this.player.getCurrentTime();
+          timeDiff = nextProps.socketPlace - playTime;
+          console.log(`${nextProps.socketPlace}-${playTime}=${timeDiff}`);
+          if (-15 < timeDiff < 15) {
+            this.player.playVideo();
+            break;
+          } else {
+            this.player.seekTo(nextProps.socketPlace);
+            this.player.playVideo();
+            break;
+          }
         case 2:
           this.player.pauseVideo();
-          return;
-        case 3:
-          return;
-        case 5:
-          return;
+          break;
+        case 0:
+          break;
         default:
           break;
       }
@@ -81,8 +73,6 @@ const mapStateToProps = state => {
     socketControlId: state.vid.socketMaster,
     mySocketId: state.vid.mySocketId,
     socketState: state.vid.socketState,
-    socketQuality: state.vid.socketQuality,
-    socketRate: state.vid.socketRate,
     socketYTError: state.vid.socketYTError,
     socketPlay: state.vid.socketPlay,
     socketPlace: state.vid.socketPlace
@@ -91,8 +81,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    createYT: (videoId, controls) =>
-      dispatch(actions.createYT(videoId, controls))
+    createYT: videoId => dispatch(actions.createYT(videoId))
   };
 };
 

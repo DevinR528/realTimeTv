@@ -23,7 +23,7 @@ export const validateVidUrl = url => {
     };
   } else {
     throw new Error(
-      `URL must be either from youtube or have .mp4/ogv/avi at the end you used "${inputUrl}".`
+      `URL must be either from youtube or have .mp4/ogv/avi at the end, you tried "${inputUrl}".`
     );
   }
 };

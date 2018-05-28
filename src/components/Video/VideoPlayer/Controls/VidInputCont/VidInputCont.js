@@ -18,6 +18,9 @@ const VidInputControls = props => {
         Get
       </Button>
       <Button clicked={props.togglescreen}>Toggle</Button>
+      <Button clicked={props.togglesynced}>
+        {props.shouldsync ? "Sync is On" : "Sync is Off"}
+      </Button>
     </div>
   );
 };

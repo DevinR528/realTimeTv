@@ -20,12 +20,14 @@ class Video extends Component {
       value: "",
       loading: false
     },
-    fetchable: false
+    fetchable: false,
+    shouldSync: true
   };
 
   componentWillMount() {
     console.log("[compWillMount]");
     this.socket = io.connect("http://localhost:5000", {
+      autoConnect: false,
       transports: ["websocket"]
     });
 
@@ -50,21 +52,15 @@ class Video extends Component {
     });
 
     // starts all players at the same time once ready
-    this.socket.on("allIsReady", () => {
+    this.socket.on("allIsReady", readyObj => {
       console.log("[in allIsReady]");
-      this.props.setSocketPlay(true);
-    });
-
-    // sync's playback rate so video stays synced
-    this.socket.on("updateRate", recObj => {
-      console.log("[in updateRate]");
-      this.props.setSocketRate(recObj.rate);
-    });
-
-    // if error occurs deals with error
-    this.socket.on("updateError", recObj => {
-      console.log("[in updateError]");
-      this.props.setSocketYTErr(recObj.err);
+      if (readyObj.errMsg) {
+        this.props.onError(readyObj.errMsg);
+      } else if (readyObj.msg) {
+        console.log(readyObj.msg);
+      } else {
+        this.props.setSocketPlay(true);
+      }
     });
 
     // sync's state of video play, pause and checks for duration changes
@@ -82,32 +78,33 @@ class Video extends Component {
     console.dir(this.socket);
   }
 
-  componentDidMount() {}
-
   componentWillReceiveProps(nextProps, nextState) {
-    if (nextProps.isReady !== this.props.isReady) {
-      console.log("[cwuReady]" + nextProps.isReady);
-      this.socket.emit("isReady");
-    } else if (nextProps.ytErrCode !== this.props.ytErrCode) {
-      //2 bad videoID, 5html, 100 not found, 101 and 150 owner denial
-      console.log("[cwuytErr]" + nextProps.ytErrCode);
-      this.socket.emit("onYTError", {
-        err: nextProps.ytErrCode
-      });
-    }
-    if (nextProps.socketControlId === nextProps.mySocketId) {
-      if (nextProps.stateNum !== this.props.stateNum) {
+    if (nextState.shouldSync === true) {
+      if (!this.socket.id) {
+        this.socket.open();
+      }
+      if (nextProps.isReady !== this.props.isReady) {
+        console.log("[cwuReady]" + nextProps.isReady);
+        this.socket.emit("isReady");
+      } else if (nextProps.ytErrCode !== this.props.ytErrCode) {
+        //2 bad videoID, 5html, 100 not found, 101 and 150 owner denial
+        console.log("[cwuytErr]" + nextProps.ytErrCode);
+        this.props.onError(
+          `The video id ${this.props.videoId} was not found. Try again!`
+        );
+      } else if (nextProps.stateNum !== this.props.stateNum) {
         console.log("[cwuState]" + nextProps.stateNum);
         this.socket.emit("stateChange", {
           state: nextProps.stateNum
         });
       } else if (nextProps.ytPlace !== this.props.ytPlace) {
-        //2 bad videoID, 5html, 100 not found, 101 and 150 owner denial
         console.log("[cwuPlace]" + nextProps.ytPlace);
         this.socket.emit("placeChange", {
           ytPlace: nextProps.ytPlace
         });
       }
+    } else {
+      this.socket.emit("disconnect", { id: this.socket.id });
     }
   }
 
@@ -153,7 +150,15 @@ class Video extends Component {
     updateFetchable.fetchable = true;
     updateInput.value = event.target.value;
     this.setState({ input: updateInput, fetchable: updateFetchable });
-    console.log(updateInput.value + updateFetchable.fetchable);
+  };
+
+  toggleSyncedHandler = event => {
+    event.preventDefault();
+    const updateSync = {
+      ...this.state
+    };
+    updateSync.shouldSync = !this.state.shouldSync;
+    this.setState({ shouldSync: updateSync });
   };
 
   render() {
@@ -182,6 +187,8 @@ class Video extends Component {
           togglescreen={this.props.onToggle}
           readyfetch={this.state.fetchable}
           fetchmedia={this.fetchMediaHandler}
+          shouldsync={this.state.shouldSync}
+          togglesynced={this.toggleSyncedHandler}
         />
       </div>
     );
@@ -191,12 +198,12 @@ class Video extends Component {
 const mapStateToProps = state => {
   return {
     source: state.vid.source,
+    videoId: state.vid.videoId,
     toggle: state.vid.open,
     errorMsg: state.vid.error,
     screenType: state.vid.isScreen,
     isReady: state.iframe.isReady,
     stateNum: state.iframe.stateNum,
-    rate: state.iframe.rate,
     ytErrCode: state.iframe.ytErrCode,
     ytPlace: state.iframe.ytPlace,
     socketControlId: state.vid.socketMaster,

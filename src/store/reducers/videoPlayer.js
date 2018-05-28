@@ -10,7 +10,6 @@ const initialState = {
   socketPlay: false,
   socketMaster: null,
   mySocketId: null,
-  socketRate: null,
   socketYTError: null,
   socketState: null,
   socketPlace: null
@@ -37,10 +36,6 @@ const onError = (state, action) => {
 
 const setSocketPlay = (state, action) => {
   return updateObject(state, { socketPlay: action.socketPlay });
-};
-
-const setSocketRate = (state, action) => {
-  return updateObject(state, { socketRate: action.socketRate });
 };
 
 const setSocketYTError = (state, action) => {
@@ -79,8 +74,6 @@ const reducer = (state = initialState, action) => {
       return setSocketMaster(state, action);
     case actionTypes.SET_MY_SOCKET_ID:
       return setMySocketId(state, action);
-    case actionTypes.SET_SOCKET_RATE:
-      return setSocketRate(state, action);
     case actionTypes.SET_SOCKET_YT_ERROR:
       return setSocketYTError(state, action);
     case actionTypes.SET_SOCKET_STATE:

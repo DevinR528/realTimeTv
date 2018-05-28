@@ -7,7 +7,6 @@ export {
   setSocketMaster,
   setMySocketId,
   setSocketPlace,
-  setSocketRate,
   setSocketYTError,
   setSocketState
 } from "./videoPlayer";
