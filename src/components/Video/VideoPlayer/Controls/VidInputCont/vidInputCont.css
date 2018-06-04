@@ -1,8 +1,15 @@
 .VideoInput {
     width: 100%;
     background-color: #ccc;
+    border-radius: 3px;
     align-items: flex-start;
-    justify-content: center;
+    display: flex;
+    flex-flow: row;
+}
+
+.ToggleButton {
+    align-self: flex-end;
+    margin: 0px auto 0px auto;
     display: flex;
     flex-flow: row;
 }

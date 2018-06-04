@@ -11,7 +11,6 @@ class Iframe extends Component {
   componentDidMount() {
     this.props.createYT(this.props.videoId).then(player => {
       this.player = player;
-      console.dir(this.player);
     });
   }
 
@@ -21,11 +20,12 @@ class Iframe extends Component {
       console.log("[cWU]" + nextProps.socketState);
       let playTime, timeDiff;
       switch (nextProps.socketState) {
+        //TODO
         case 1:
           playTime = this.player.getCurrentTime();
           timeDiff = nextProps.socketPlace - playTime;
           console.log(`${nextProps.socketPlace}-${playTime}=${timeDiff}`);
-          if (-15 < timeDiff < 15) {
+          if (-10 < timeDiff < 10) {
             this.player.playVideo();
             break;
           } else {
@@ -41,12 +41,12 @@ class Iframe extends Component {
         default:
           break;
       }
-    } else {
-      return;
     }
   }
 
   componentWillUnmount() {
+    console.log("IFrame Out");
+    this.props.reset();
     const yt = document.getElementById("inPlayer");
     const replaceDiv = document.createElement("div");
     replaceDiv.id = "player";
@@ -81,7 +81,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    createYT: videoId => dispatch(actions.createYT(videoId))
+    createYT: videoId => dispatch(actions.createYT(videoId)),
+    reset: () => dispatch(actions.reset())
   };
 };
 

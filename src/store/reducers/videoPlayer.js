@@ -54,8 +54,11 @@ const setSocketMaster = (state, action) => {
   return updateObject(state, { socketMaster: action.socketMaster });
 };
 
-const setMySocketId = (state, action) => {
-  return updateObject(state, { mySocketId: action.mySocketId });
+const reset = (state, action) => {
+  return updateObject(state, {
+    videoId: null,
+    source: null
+  });
 };
 
 const reducer = (state = initialState, action) => {
@@ -72,8 +75,8 @@ const reducer = (state = initialState, action) => {
       return setSocketPlay(state, action);
     case actionTypes.SET_SOCKET_MASTER:
       return setSocketMaster(state, action);
-    case actionTypes.SET_MY_SOCKET_ID:
-      return setMySocketId(state, action);
+    case actionTypes.RESET:
+      return reset(state, action);
     case actionTypes.SET_SOCKET_YT_ERROR:
       return setSocketYTError(state, action);
     case actionTypes.SET_SOCKET_STATE:

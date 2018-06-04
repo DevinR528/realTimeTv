@@ -42,10 +42,9 @@ export const setSocketMaster = socketMasterId => {
   };
 };
 
-export const setMySocketId = mySocketId => {
+export const reset = () => {
   return {
-    type: actionTypes.SET_MY_SOCKET_ID,
-    mySocketId: mySocketId
+    type: actionTypes.RESET
   };
 };
 

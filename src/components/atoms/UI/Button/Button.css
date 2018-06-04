@@ -6,7 +6,7 @@
     cursor: pointer;
     font: inherit;
     padding: 5px;
-    margin: 5px;
+    margin: 5px auto 5px auto;
     font-weight: bold;
 }
 
@@ -21,11 +21,12 @@
 }
 
 .Success {
-    color: #5c9210;
+    color: #0f62bb;
+    box-shadow: 1px 3px 3px rgb(140, 139, 139);
 }
 
 .Success:hover {
-    color: rgb(127, 204, 20);
+    color: rgb(20, 167, 204);
 }
 
 .Danger {

@@ -13,6 +13,7 @@
     "readyfetch",
     "shouldsync",
     "togglescreen",
+    "togglesync",
     "togglesynced",
     "tset",
     "turl",

@@ -5,10 +5,11 @@ export {
   onError,
   setSocketPlay,
   setSocketMaster,
-  setMySocketId,
+  reset,
   setSocketPlace,
   setSocketYTError,
-  setSocketState
+  setSocketState,
+  setSocketDone
 } from "./videoPlayer";
 
 export { createYT } from "./iframe";

@@ -6,8 +6,8 @@ export const createYT = videoId => {
     return new Promise(resolve => {
       loadSdk().then(YT => {
         const playerObj = new YT.Player("player", {
-          height: "200",
-          width: "369",
+          height: "275",
+          width: "470",
           videoId: `${videoId}`,
           playerVars: { origin: window.location.origin },
           events: {
@@ -57,7 +57,8 @@ export const createYT = videoId => {
         //2 bad videoID, 5html, 100 not found, 101 and 150 owner denial,
         function onPlayerError(event) {
           dispatch(onYTError(event.data));
-          console.log(`[createYTaction] ${event}`);
+          console.log(`[createYTaction] ${event.data}`);
+          console.dir(event);
         }
       });
     });
@@ -89,11 +90,5 @@ export const onPlaceChange = ytPlace => {
   return {
     type: actionTypes.ON_YT_PLACE,
     ytPlace: ytPlace
-  };
-};
-
-export const onEndReset = () => {
-  return {
-    type: actionTypes.ON_END_RESET
   };
 };
