@@ -4,6 +4,7 @@
   },
   "editor.snippetSuggestions": "top",
   "cSpell.words": [
+    "enablejsapi",
     "fetchmedia",
     "imgpost",
     "incontrols",
@@ -11,6 +12,7 @@
     "keepsynced",
     "passchange",
     "readyfetch",
+    "screenopen",
     "shouldsync",
     "togglescreen",
     "togglesync",

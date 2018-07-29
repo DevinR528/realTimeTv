@@ -6,7 +6,7 @@ export const ON_ERROR = "ON_ERROR";
 
 // sent from video "container" via socket to all youTube players
 export const SET_SOCKET_MASTER = "SET_SOCKET_MASTER";
-export const RESET = "RESET";
+export const SET_CONTROL_YT = "SET_CONTROL_YT";
 export const SET_SOCKET_PLAY = "SET_SOCKET_PLAY";
 export const SET_SOCKET_YT_ERROR = "SET_SOCKET_YT_ERROR";
 export const SET_SOCKET_STATE = "SET_SOCKET_STATE";

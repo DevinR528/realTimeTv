@@ -4,12 +4,11 @@ import { updateObject } from "../utility";
 const initialState = {
   videoId: null,
   source: null,
-  error: false,
+  error: null,
   isScreen: true,
   open: false,
   socketPlay: false,
   socketMaster: null,
-  mySocketId: null,
   socketYTError: null,
   socketState: null,
   socketPlace: null
@@ -54,13 +53,6 @@ const setSocketMaster = (state, action) => {
   return updateObject(state, { socketMaster: action.socketMaster });
 };
 
-const reset = (state, action) => {
-  return updateObject(state, {
-    videoId: null,
-    source: null
-  });
-};
-
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.TOGGLE_SCREEN:
@@ -75,8 +67,6 @@ const reducer = (state = initialState, action) => {
       return setSocketPlay(state, action);
     case actionTypes.SET_SOCKET_MASTER:
       return setSocketMaster(state, action);
-    case actionTypes.RESET:
-      return reset(state, action);
     case actionTypes.SET_SOCKET_YT_ERROR:
       return setSocketYTError(state, action);
     case actionTypes.SET_SOCKET_STATE:

@@ -42,12 +42,6 @@ export const setSocketMaster = socketMasterId => {
   };
 };
 
-export const reset = () => {
-  return {
-    type: actionTypes.RESET
-  };
-};
-
 export const setSocketPlace = socketPlace => {
   return {
     type: actionTypes.SET_SOCKET_PLACE,

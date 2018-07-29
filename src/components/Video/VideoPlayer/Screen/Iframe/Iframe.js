@@ -2,15 +2,14 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 
 import * as actions from "../../../../../store/actions/index";
-import ErrorBoundary from "../../../../atoms/hoc/withErrorHandler/withErrorHandler";
 import styles from "./Iframe.css";
+import { destroyIframeYT } from "./util";
 
 class Iframe extends Component {
-  componentWillMount() {}
-
   componentDidMount() {
     this.props.createYT(this.props.videoId).then(player => {
       this.player = player;
+      console.dir(this.player);
     });
   }
 
@@ -20,47 +19,77 @@ class Iframe extends Component {
       console.log("[cWU]" + nextProps.socketState);
       let playTime, timeDiff;
       switch (nextProps.socketState) {
-        //TODO
         case 1:
           playTime = this.player.getCurrentTime();
           timeDiff = nextProps.socketPlace - playTime;
-          console.log(`${nextProps.socketPlace}-${playTime}=${timeDiff}`);
-          if (-10 < timeDiff < 10) {
-            this.player.playVideo();
-            break;
+          if (timeDiff < 10) {
+            if (timeDiff > -10) {
+              console.log("[noDiff]");
+              this.player.playVideo();
+              break;
+            } else {
+              console.log("[Diff]");
+              this.player.seekTo(nextProps.socketPlace, true);
+              this.player.playVideo();
+              break;
+            }
           } else {
-            this.player.seekTo(nextProps.socketPlace);
+            console.log("[Diff]");
+            this.player.seekTo(nextProps.socketPlace, true);
             this.player.playVideo();
             break;
           }
         case 2:
-          this.player.pauseVideo();
-          break;
+          playTime = this.player.getCurrentTime();
+          timeDiff = nextProps.socketPlace - playTime;
+          if (timeDiff < 10) {
+            if (timeDiff > -10) {
+              console.log("[noDiff]");
+              this.player.pauseVideo();
+              break;
+            } else {
+              console.log("[Diff]");
+              this.player.seekTo(nextProps.socketPlace, true);
+              this.player.pauseVideo();
+              break;
+            }
+          } else {
+            console.log("[Diff]");
+            this.player.seekTo(nextProps.socketPlace, true);
+            this.player.pauseVideo();
+            break;
+          }
         case 0:
           break;
         default:
           break;
       }
     }
+    // TODO
+    if (
+      nextProps.videoId !== this.props.videoId &&
+      this.props.videoId !== null
+    ) {
+      if (this.player) {
+        this.player.loadVideoById(nextProps.videoId);
+        console.dir(this.player);
+      } else {
+        this.props.createYT(nextProps.videoId).then(player => {
+          this.player = player;
+        });
+      }
+    }
   }
 
   componentWillUnmount() {
-    console.log("IFrame Out");
-    this.props.reset();
-    const yt = document.getElementById("inPlayer");
-    const replaceDiv = document.createElement("div");
-    replaceDiv.id = "player";
-    const parent = document.getElementById("outPlayer");
-    parent.replaceChild(replaceDiv, yt);
+    destroyIframeYT();
   }
 
   render() {
     return (
       <div id="outPlayer">
         <div id="inPlayer">
-          <ErrorBoundary>
-            <div id="player" className={styles.Screen} />
-          </ErrorBoundary>
+          <div id="player" className={styles.Screen} />
         </div>
       </div>
     );
@@ -71,19 +100,21 @@ const mapStateToProps = state => {
   return {
     videoId: state.vid.videoId,
     socketControlId: state.vid.socketMaster,
-    mySocketId: state.vid.mySocketId,
     socketState: state.vid.socketState,
-    socketYTError: state.vid.socketYTError,
     socketPlay: state.vid.socketPlay,
+    ytErrCode: state.iframe.ytErrCode,
     socketPlace: state.vid.socketPlace
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    createYT: videoId => dispatch(actions.createYT(videoId)),
-    reset: () => dispatch(actions.reset())
+    createYT: (videoId, controls) =>
+      dispatch(actions.createYT(videoId, controls))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Iframe);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Iframe);

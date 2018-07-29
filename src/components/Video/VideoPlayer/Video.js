@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import io from "socket.io-client";
 
-import Screen from "./Screen/VideoScreen/VideoScreen";
 import styles from "./Video.css";
 import VidInputControls from "./Controls/VidInputCont/VidInputCont";
 import Iframe from "./Screen/Iframe/Iframe";
@@ -21,27 +20,37 @@ class Video extends Component {
       loading: false
     },
     fetchable: false,
-    shouldSync: true,
-    whilePlaying: false
+    shouldSync: true
   };
 
   componentWillMount() {
-    console.log("[compWillMount]");
-    this.socket = io.connect("http://localhost:5000", {
-      transports: ["websocket"]
-    });
+    this.socket = io.connect(
+      "http://localhost:5000",
+      {
+        transports: ["websocket"]
+      }
+    );
 
-    this.socket.on("connect", () => {});
+    this.socket.on("connect_error", err => {
+      console.log(err.message);
+      // TODO use errorBoundry
+      this.props.onError(err.message + ": Try turning off Sync.");
+    });
 
     this.socket.on("reconnect_attempt", () => {
       console.log("[in reconnect]");
-      this.socket.io.opts.transports = ["polling", "websocket"];
+      this.socket.io.opts.transports = ["websocket", "polling"];
     });
 
     // sync's all video players to current video url
     this.socket.on("updateVideo", recObj => {
       console.log("[in updateVideo]");
-      this.props.onToggle();
+      if (this.props.errorMsg) {
+        this.props.onError(null);
+      }
+      if (this.props.isReady) {
+        this.props.onReady(false);
+      }
       this.props.setSocketMaster(recObj.controlId);
       this.props.getScreenType(recObj.screenState);
       this.props.getMedia(recObj.url, recObj.id);
@@ -56,8 +65,9 @@ class Video extends Component {
       if (readyObj) {
         if (readyObj.errMsg) {
           this.props.onError(readyObj.errMsg);
-        } else if (readyObj.msg) {
-          //TODO
+        }
+        if (readyObj.msg) {
+          // TODO
           console.log(readyObj.msg);
           this.props.setSocketPlay(false);
           this.props.onError(readyObj.msg);
@@ -73,20 +83,17 @@ class Video extends Component {
     });
 
     // sync's video duration
-    //TODO
     this.socket.on("updatePlace", recObj => {
       this.props.setSocketPlace(recObj.place);
-    });
-
-    //
-    this.socket.on("updateDone", recObj => {
-      this.props.setSocketDone(recObj.isDone);
     });
   }
 
   componentWillReceiveProps(nextProps, nextState) {
-    if (nextProps.isReady !== this.props.isReady) {
-      this.socket.emit("isReady");
+    if (
+      nextProps.isReady !== this.props.isReady &&
+      nextProps.isReady === true
+    ) {
+      this.socket.emit("isReady", { ids: this.socket.id });
     }
     if (nextProps.ytErrCode !== this.props.ytErrCode) {
       //2 bad videoID, 5html, 100 not found, 101 and 150 owner denial
@@ -100,9 +107,11 @@ class Video extends Component {
       });
     }
     if (nextProps.ytPlace !== this.props.ytPlace) {
-      this.socket.emit("placeChange", {
-        ytPlace: nextProps.ytPlace
-      });
+      if (nextProps.socketControlId === this.socket.id) {
+        this.socket.emit("placeChange", {
+          ytPlace: nextProps.ytPlace
+        });
+      }
     }
   }
 
@@ -110,24 +119,24 @@ class Video extends Component {
     this.socket.close();
   }
 
+  resetVideo = () => {
+    this.props.setSocketPlay(false);
+  };
+
   SetVideo = () => {
-    try {
+    if (this.props.errorMsg) {
       this.props.onError(null);
+    }
+    try {
       const urlState = validateVidUrl(this.state.input.value);
-      if (urlState) {
-        this.props.getScreenType(urlState.screenState);
-        this.props.getMedia(urlState.url, urlState.id);
-        if (!this.props.toggle) {
-          this.props.onToggle();
-        }
-        // to pass videoId, videoURL, screenState
-        this.socket.emit("newVideo", {
-          url: urlState.url,
-          vidId: urlState.id,
-          screenState: urlState.screenState,
-          controlId: this.socket.id
-        });
-      }
+
+      // to pass videoId, videoURL, screenState
+      this.socket.emit("newVideo", {
+        url: urlState.url,
+        vidId: urlState.id,
+        screenState: urlState.screenState,
+        controlId: this.socket.id
+      });
     } catch (err) {
       this.props.onError(err.message);
 
@@ -135,19 +144,16 @@ class Video extends Component {
     }
   };
 
-  fetchMediaHandler = event => {
-    event.preventDefault();
-    if (this.state.whilePlaying) {
+  fetchMediaHandler = () => {
+    if (this.props.isReady) {
+      this.resetVideo();
       this.SetVideo();
     } else {
       this.SetVideo();
-      this.setState(prevState => {
-        return { whilePlaying: true };
-      });
     }
   };
 
-  inputChangedHandler = event => {
+  inputChangedHandler = e => {
     const updateInput = {
       ...this.state.input
     };
@@ -155,7 +161,7 @@ class Video extends Component {
       ...this.state
     };
     updateFetchable.fetchable = true;
-    updateInput.value = event.target.value;
+    updateInput.value = e.target.value;
     this.setState({ input: updateInput, fetchable: updateFetchable });
   };
 
@@ -165,26 +171,32 @@ class Video extends Component {
     });
   };
 
+  toggleScreenHandler = () => {
+    this.props.onToggle();
+  };
+
   render() {
-    let vidScreen = this.props.screenType ? (
-      <Screen incontrols={true} source={this.props.source} />
+    if (this.state.shouldSync) {
+      if (!this.socket.connected) {
+        this.socket.open();
+      }
+    } else {
+      this.socket.close();
+    }
+
+    let screenOrErr = this.props.errorMsg ? (
+      <p className={styles.Screen}>{this.props.errorMsg}</p>
     ) : (
       <Iframe />
     );
 
     let mediaPlayer = this.props.toggle ? (
-      <div className={styles.Screen}>{vidScreen}</div>
+      <div className={styles.Screen}>{screenOrErr}</div>
     ) : null;
-
-    let onErrorMsg = this.props.errorMsg ? (
-      <p className={styles.Screen}>{this.props.errorMsg}</p>
-    ) : (
-      mediaPlayer
-    );
 
     return (
       <div className={styles.Player}>
-        {onErrorMsg}
+        {mediaPlayer}
         <VidInputControls
           input={this.state.input}
           passchange={event => this.inputChangedHandler(event)}
@@ -211,8 +223,7 @@ const mapStateToProps = state => {
     stateNum: state.iframe.stateNum,
     ytErrCode: state.iframe.ytErrCode,
     ytPlace: state.iframe.ytPlace,
-    socketControlId: state.vid.socketMaster,
-    mySocketId: state.vid.mySocketId
+    socketControlId: state.vid.socketMaster
   };
 };
 
@@ -222,6 +233,7 @@ const mapDispatchToProps = dispatch => {
     getScreenType: screen => dispatch(actions.getScreenType(screen)),
     getMedia: (source, id) => dispatch(actions.getMedia(source, id)),
     onError: err => dispatch(actions.onError(err)),
+    onReady: isReady => dispatch(actions.onReady(isReady)),
     setSocketPlay: shouldPlay => dispatch(actions.setSocketPlay(shouldPlay)),
     setSocketMaster: controlId => dispatch(actions.setSocketMaster(controlId)),
     setSocketPlace: socketPlace =>
@@ -230,4 +242,7 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Video);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Video);

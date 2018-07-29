@@ -9,7 +9,9 @@ export const createYT = videoId => {
           height: "275",
           width: "470",
           videoId: `${videoId}`,
-          playerVars: { origin: window.location.origin },
+          playerVars: {
+            origin: window.location.origin
+          },
           events: {
             onReady: onPlayerReady,
             onStateChange: onPlayerStateChange,
@@ -37,8 +39,6 @@ export const createYT = videoId => {
               break;
             case 3:
               dispatch(onStateChange(event.data));
-              const buffPlace = event.target.getCurrentTime();
-              dispatch(onPlaceChange(buffPlace));
               break;
             case 0:
               break;
@@ -57,8 +57,6 @@ export const createYT = videoId => {
         //2 bad videoID, 5html, 100 not found, 101 and 150 owner denial,
         function onPlayerError(event) {
           dispatch(onYTError(event.data));
-          console.log(`[createYTaction] ${event.data}`);
-          console.dir(event);
         }
       });
     });
