@@ -38,13 +38,11 @@ class Video extends Component {
     });
 
     this.socket.on("reconnect_attempt", () => {
-      console.log("[in reconnect]");
       this.socket.io.opts.transports = ["websocket", "polling"];
     });
 
     // sync's all video players to current video url
     this.socket.on("updateVideo", recObj => {
-      console.log("[in updateVideo]");
       if (this.props.errorMsg) {
         this.props.onError(null);
       }
@@ -61,7 +59,6 @@ class Video extends Component {
 
     // starts all players at the same time once ready
     this.socket.on("allIsReady", readyObj => {
-      console.log("[in allIsReady]");
       if (readyObj) {
         if (readyObj.errMsg) {
           this.props.onError(readyObj.errMsg);
@@ -101,11 +98,13 @@ class Video extends Component {
         `The video id ${this.props.videoId} was not found. Try again!`
       );
     }
+    //to sync players state
     if (nextProps.stateNum !== this.props.stateNum) {
       this.socket.emit("stateChange", {
         state: nextProps.stateNum
       });
     }
+    // to check for controlling socket (user who got video)
     if (nextProps.ytPlace !== this.props.ytPlace) {
       if (nextProps.socketControlId === this.socket.id) {
         this.socket.emit("placeChange", {
@@ -139,8 +138,9 @@ class Video extends Component {
       });
     } catch (err) {
       this.props.onError(err.message);
-
-      console.log(err.message);
+      if (!this.props.toggle) {
+        this.props.onToggle();
+      }
     }
   };
 

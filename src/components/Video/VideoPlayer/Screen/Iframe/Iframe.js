@@ -9,14 +9,12 @@ class Iframe extends Component {
   componentDidMount() {
     this.props.createYT(this.props.videoId).then(player => {
       this.player = player;
-      console.dir(this.player);
     });
   }
 
   componentWillReceiveProps(nextProps, nextState) {
     // sync's duration on play, and pauses when synced
     if (nextProps.socketState !== this.props.socketState) {
-      console.log("[cWU]" + nextProps.socketState);
       let playTime, timeDiff;
       switch (nextProps.socketState) {
         case 1:
@@ -24,17 +22,14 @@ class Iframe extends Component {
           timeDiff = nextProps.socketPlace - playTime;
           if (timeDiff < 10) {
             if (timeDiff > -10) {
-              console.log("[noDiff]");
               this.player.playVideo();
               break;
             } else {
-              console.log("[Diff]");
               this.player.seekTo(nextProps.socketPlace, true);
               this.player.playVideo();
               break;
             }
           } else {
-            console.log("[Diff]");
             this.player.seekTo(nextProps.socketPlace, true);
             this.player.playVideo();
             break;
@@ -44,17 +39,14 @@ class Iframe extends Component {
           timeDiff = nextProps.socketPlace - playTime;
           if (timeDiff < 10) {
             if (timeDiff > -10) {
-              console.log("[noDiff]");
               this.player.pauseVideo();
               break;
             } else {
-              console.log("[Diff]");
               this.player.seekTo(nextProps.socketPlace, true);
               this.player.pauseVideo();
               break;
             }
           } else {
-            console.log("[Diff]");
             this.player.seekTo(nextProps.socketPlace, true);
             this.player.pauseVideo();
             break;
@@ -72,7 +64,6 @@ class Iframe extends Component {
     ) {
       if (this.player) {
         this.player.loadVideoById(nextProps.videoId);
-        console.dir(this.player);
       } else {
         this.props.createYT(nextProps.videoId).then(player => {
           this.player = player;

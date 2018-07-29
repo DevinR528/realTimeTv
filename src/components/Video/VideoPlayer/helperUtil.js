@@ -41,18 +41,4 @@ export const validateVidUrl = url => {
     );
   }
 };
-/**
- *
- * @function checkForSync
- * @param {boolean} stateToCheck property of state object bool
- * @param {object} socket
- */
-export const checkForSync = (stateToCheck, socket) => {
-  if (stateToCheck) {
-    if (!socket.connected) {
-      socket.open();
-    }
-  } else {
-    socket.close();
-  }
-};
+
