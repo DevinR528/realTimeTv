@@ -18,10 +18,12 @@ npm start
 
 ### your server will have to respond to the following events
 
-`newVideo` event \n
-`isReady` event \n
+```
+`newVideo` event
+`isReady` event
 `stateChange` event
 `placeChange` event
+```
 
 here is the example server responding to the events
 ```js
