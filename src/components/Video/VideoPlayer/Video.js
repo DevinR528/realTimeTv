@@ -9,6 +9,7 @@ import * as actions from "../../../store/actions/index";
 import { validateVidUrl } from "./helperUtil";
 
 class Video extends Component {
+
   state = {
     input: {
       eleType: "input",
@@ -24,6 +25,8 @@ class Video extends Component {
   };
 
   componentWillMount() {
+
+    // for the socket
     this.socket = io.connect(
       "http://localhost:5000",
       {
@@ -86,6 +89,8 @@ class Video extends Component {
   }
 
   componentWillReceiveProps(nextProps, nextState) {
+
+  // video and socket checks
     if (
       nextProps.isReady !== this.props.isReady &&
       nextProps.isReady === true

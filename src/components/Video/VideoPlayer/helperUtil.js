@@ -1,4 +1,4 @@
-import queryString from "query-string";
+import queryString from "querystring";
 
 /**
  *
@@ -7,31 +7,32 @@ import queryString from "query-string";
  * @returns {object} parsed URL for video, gives url, id or error
  */
 export const validateVidUrl = url => {
-  const inputUrl = url;
-  const urlObj = queryString.parseUrl(inputUrl);
-
-  if (urlObj.url.includes(".youtube.com")) {
+  const urlArr = url.split('?');
+  const inputUrl = urlArr[0];
+  const query = urlArr[1];
+  const urlObj = queryString.parse(query);
+  if (inputUrl.includes(".youtube.com")) {
     // TODO for youtube search api
-    if (!urlObj.query.v) {
+    if (!urlObj.v) {
       throw new Error(
         `The URL should look like this https://www.youtube.com/watch?v=mCscZ2tPFmI`
       );
     } else {
       try {
-        const id = urlObj.query.v.length;
+        const id = urlObj.v.length;
         if (!id === 11) {
-          throw new Error(`The video id "${urlObj.query.v}" was not valid`);
+          throw new Error(`The video id "${urlObj.v}" was not valid`);
         }
       } catch (err) {
         console.log(err);
       }
     }
-    const cutStr = urlObj.url.substr(0, 23);
-    const embedStr = cutStr + "/embed/" + urlObj.query.v + "?enablejsapi=1";
+
+    const embedStr = "https://www.youtube.com/embed/" + urlObj.v + "?enablejsapi=1";
 
     return {
       url: embedStr,
-      id: urlObj.query.v,
+      id: urlObj.v,
       screenState: false
     };
   } else {
