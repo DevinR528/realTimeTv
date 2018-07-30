@@ -2,7 +2,7 @@
 built with [Create React App](https://github.com/facebookincubator/create-react-app) and socket.io
 
 ## Check it out
-[Real-Time TV](https://google.com)
+[Real-Time TV](https://real-time-tv.herokuapp.com/)
 
 ## Installing and using the component
 
