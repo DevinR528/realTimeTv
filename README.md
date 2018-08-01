@@ -1,15 +1,25 @@
+# RealTimeTV
+
+[![Travis][build-badge]][build]
+[![npm package][npm-badge]][npm]
+[![Coveralls][coveralls-badge]][coveralls]
+
 ## RealTime-TV
-built with [Create React App](https://github.com/facebookincubator/create-react-app) and socket.io
+built with [Create React App](https://github.com/facebookincubator/create-react-app) redux and socket.io.
 
 ## Check it out
 [Real-Time TV](https://real-time-tv.herokuapp.com/)
+then open another tab to the same url and paste a youtube url in and watch the rtc magic happen.
 
 ## Installing and using the component
 
 ```bash
-npm i --save real-time-tv?
+npm i --save real-time-tv
 ```
-or clone the repo and run in dev server port is set to 5000
+
+Unfortunately The Component was ejected as such, to enable the css it has to be used with an ejected app using css modules plugin. 
+
+or clone the [git repo](https://github.com/DevinR528/realTimeTv.git) and run in dev server port is set to 5000.
 
 ```bash
 npm install
@@ -102,3 +112,12 @@ io.on("connection", socket => {
     });
 });
 ```
+
+[build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
+[build]: https://travis-ci.org/user/repo
+
+[npm-badge]: https://img.shields.io/npm/v/npm-package.png?style=flat-square
+[npm]: https://www.npmjs.org/package/npm-package
+
+[coveralls-badge]: https://img.shields.io/coveralls/user/repo/master.png?style=flat-square
+[coveralls]: https://coveralls.io/github/user/repo
